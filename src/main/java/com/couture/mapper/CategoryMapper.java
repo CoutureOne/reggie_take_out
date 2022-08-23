@@ -1,15 +1,15 @@
 package com.couture.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.couture.entity.Employee;
+import com.couture.entity.Category;
 import org.apache.ibatis.annotations.Mapper;
 
 /**
  * @author Couture
- * @data: 2022/8/21
+ * @data: 2022/8/23
  * @description:
  */
 @Mapper
-public interface EmployeeMapper extends BaseMapper<Employee> {
+public interface CategoryMapper extends BaseMapper<Category> {
 
 }
