@@ -9,5 +9,5 @@ import com.couture.entity.Category;
  * @description:
  */
 public interface CategoryService extends IService<Category> {
-
+    void remove(Long id);
 }
