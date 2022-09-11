@@ -41,8 +41,8 @@ public class CategoryController {
     /**
      * 分页查询
      *
-     * @param page
-     * @param pageSize
+     * @param page 页面
+     * @param pageSize 页面大小
      * @return
      */
     @GetMapping("/page")

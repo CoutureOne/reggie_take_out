@@ -1,15 +1,24 @@
 package com.couture.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.couture.common.R;
 import com.couture.dto.DishDto;
+import com.couture.entity.Category;
+import com.couture.entity.Dish;
 import com.couture.service.CategoryService;
 import com.couture.service.DishFlavorService;
 import com.couture.service.DishService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Couture
@@ -43,5 +52,41 @@ public class DishController {
         dishService.saveWithFlavor(dishDto);
 
         return R.success("新增菜品成功");
+    }
+
+    @GetMapping("/page")
+    public R<Page> page(int page, int pageSize, String name) {
+        Page<Dish> pageInfo = new Page<>(page, pageSize);
+        Page<DishDto> dishDtoPage = new Page<>();
+
+        LambdaQueryWrapper<Dish> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.like(name != null, Dish::getName, name);
+        queryWrapper.orderByDesc(Dish::getUpdateTime);
+
+        // 分页查询
+        dishService.page(pageInfo, queryWrapper);
+        BeanUtils.copyProperties(pageInfo, dishDtoPage, "records");
+
+        List<Dish> records = pageInfo.getRecords();
+        List<DishDto> list = records.stream().map((item) -> {
+            DishDto dishDto = new DishDto();
+
+            BeanUtils.copyProperties(item, dishDto);
+            // 分类 id
+            Long categoryId = item.getCategoryId();
+            Category category = categoryService.getById(categoryId);
+
+            if (category != null) {
+                String categoryName = category.getName();
+                dishDto.setCategoryName(categoryName);
+            }
+
+            return dishDto;
+
+        }).collect(Collectors.toList());
+
+        dishDtoPage.setRecords(list);
+
+        return R.success(pageInfo);
     }
 }

@@ -15,6 +15,4 @@ public class ReggieTakeOutApplication {
         SpringApplication.run(ReggieTakeOutApplication.class, args);
         log.info("项目启动成功~");
     }
-
-
 }
