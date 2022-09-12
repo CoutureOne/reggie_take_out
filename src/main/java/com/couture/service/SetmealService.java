@@ -1,6 +1,7 @@
 package com.couture.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.couture.dto.SetmealDto;
 import com.couture.entity.Setmeal;
 
 /**
@@ -9,4 +10,10 @@ import com.couture.entity.Setmeal;
  * @description:
  */
 public interface SetmealService extends IService<Setmeal> {
+
+    /**
+     * 新增套餐，同时需要保存套餐和菜品的关联关系
+     * @param setmealDto
+     */
+    void saveWithDish(SetmealDto setmealDto);
 }

@@ -12,10 +12,7 @@ import com.couture.service.DishService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -65,9 +62,11 @@ public class DishController {
 
         // 分页查询
         dishService.page(pageInfo, queryWrapper);
+        // 拷贝对象
         BeanUtils.copyProperties(pageInfo, dishDtoPage, "records");
 
         List<Dish> records = pageInfo.getRecords();
+
         List<DishDto> list = records.stream().map((item) -> {
             DishDto dishDto = new DishDto();
 
@@ -80,13 +79,56 @@ public class DishController {
                 String categoryName = category.getName();
                 dishDto.setCategoryName(categoryName);
             }
-
             return dishDto;
-
         }).collect(Collectors.toList());
 
         dishDtoPage.setRecords(list);
 
-        return R.success(pageInfo);
+        return R.success(dishDtoPage);
+    }
+
+    @GetMapping("/{id}")
+    public R<DishDto> get(@PathVariable Long id) {
+
+        DishDto dishDto = dishService.getByIdWithFlavor(id);
+        return R.success(dishDto);
+    }
+
+    /**
+     * 修改菜品
+     *
+     * @param dishDto
+     * @return
+     */
+    @PutMapping
+    public R<String> update(@RequestBody DishDto dishDto) {
+        log.info(dishDto.toString());
+
+        dishService.updateWithFlavor(dishDto);
+
+        return R.success("新增菜品成功");
+    }
+
+    /**
+     * 根据条件查询对应的菜品数据
+     *
+     * @param dish
+     * @return
+     */
+    @GetMapping("/list")
+    public R<List<Dish>> list(Dish dish) {
+
+        // 构造查询条件对象
+        LambdaQueryWrapper<Dish> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(dish.getCategoryId() != null, Dish::getCategoryId, dish.getCategoryId());
+        // 查询状态为1(起售状态)
+        queryWrapper.eq(Dish::getStatus, 1);
+
+        // 添加排序条件
+        queryWrapper.orderByAsc(Dish::getSort).orderByDesc(Dish::getUpdateTime);
+
+        List<Dish> list = dishService.list(queryWrapper);
+
+        return R.success(list);
     }
 }
