@@ -20,7 +20,7 @@ import java.sql.SQLIntegrityConstraintViolationException;
 public class GlobalExceptionHandler {
 
     /**
-     * 异常处理
+     * 局部异常处理
      *
      * @return
      */
